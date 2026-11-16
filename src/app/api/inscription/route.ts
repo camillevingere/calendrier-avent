@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { COOKIE_ACCES, creerTicket, DUREE_ACCES_SECONDES } from "@/lib/acces";
+import { autoriser, ipDe } from "@/lib/limite";
 import { inscrireSurLumail } from "@/lib/lumail";
 
 const Schema = z.object({
@@ -10,6 +11,10 @@ const Schema = z.object({
 });
 
 export const POST = async (requete: Request) => {
+  if (!autoriser(ipDe(requete))) {
+    return NextResponse.json({ erreur: "Doucement ! Trop d'essais d'un coup. Réessaie dans quelques minutes." }, { status: 429 });
+  }
+
   const corps = await requete.json().catch(() => null);
   const donnees = Schema.safeParse(corps);
   if (!donnees.success) {

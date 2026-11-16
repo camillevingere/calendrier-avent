@@ -30,7 +30,8 @@ export const inscrireSurLumail = async (email: string): Promise<ResultatLumail> 
         email,
         tags: [LUMAIL_TAG],
         replaceTags: false,
-        resubscribe: true,
+        // Un désabonné ne doit jamais être réinscrit par ce formulaire (RGPD).
+        resubscribe: false,
         triggerWorkflows: true,
       }),
       signal: AbortSignal.timeout(8000),
