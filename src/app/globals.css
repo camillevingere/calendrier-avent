@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+/* Couleurs Fyliz (relevées sur fyliz-website : primary hsl(24.6 100% 55%), fond hsl(240 3% 6%)) */
+@theme {
+  --color-orange: #ff781a;
+  --color-orange-clair: #ffb27a;
+  --color-orange-sombre: #b8500a;
+  --color-nuit: #0f0f10;
+  --color-ardoise: #1c1c1f;
+  --color-gris: #282828;
+  --color-gris-clair: #8a8a93;
+  --color-creme: #fff4e8;
+  --color-sapin: #3ddc84;
+
+  --font-pixel: var(--font-press-start), ui-monospace, monospace;
+  --font-terminal: var(--font-vt323), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-nuit);
+}
+
+body {
+  background:
+    radial-gradient(80% 50% at 50% -10%, rgb(255 120 26 / 0.18), transparent 70%),
+    var(--color-nuit);
+  color: var(--color-creme);
+  font-family: var(--font-terminal);
+  font-size: 1.35rem;
+  line-height: 1.35;
+  min-height: 100dvh;
+  -webkit-font-smoothing: none;
+}
+
+/* Écran cathodique : lignes de balayage par-dessus tout */
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.22) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+/* Boîte pixel : coins crénelés, bordure épaisse */
+.pixel {
+  position: relative;
+  border: 4px solid var(--bord, var(--color-orange));
+  clip-path: polygon(
+    4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px), 0 4px, 4px 4px
+  );
+}
+
+.ombre-pixel {
+  filter: drop-shadow(4px 4px 0 #000);
+}
+
+.bouton-pixel {
+  font-family: var(--font-pixel);
+  background: var(--color-orange);
+  color: var(--color-nuit);
+  box-shadow:
+    inset -4px -4px 0 var(--color-orange-sombre),
+    inset 4px 4px 0 var(--color-orange-clair);
+  transition: transform 80ms steps(2);
+}
+.bouton-pixel:hover {
+  filter: brightness(1.08);
+}
+.bouton-pixel:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    inset 4px 4px 0 var(--color-orange-sombre),
+    inset -4px -4px 0 var(--color-orange-clair);
+}
+.bouton-pixel:disabled {
+  filter: grayscale(0.6);
+  cursor: wait;
+}
+
+.texte-neon {
+  text-shadow:
+    0 0 1px var(--color-orange),
+    3px 3px 0 var(--color-orange-sombre),
+    6px 6px 0 #000;
+}
+
+@keyframes clignote {
+  50% { opacity: 0; }
+}
+.clignote {
+  animation: clignote 1s steps(1) infinite;
+}
+
+@keyframes flotte {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.flotte {
+  animation: flotte 1.2s steps(2) infinite;
+}
+
+@keyframes tombe {
+  from { transform: translateY(-10vh); }
+  to { transform: translateY(110vh); }
+}
+.flocon {
+  position: fixed;
+  top: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--color-creme);
+  opacity: 0.55;
+  animation: tombe linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+:focus-visible {
+  outline: 3px dashed var(--color-orange-clair);
+  outline-offset: 3px;
+}
+
+/* Contenu d'une case (HTML fabriqué au build) */
+.contenu-case h2 {
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--color-orange);
+  margin: 1.6rem 0 0.6rem;
+  line-height: 1.6;
+}
+.contenu-case h2::before {
+  content: "▸ ";
+}
+.contenu-case p,
+.contenu-case li {
+  margin: 0.5rem 0;
+}
+.contenu-case ul {
+  padding-left: 1.2rem;
+  list-style: square;
+}
+.contenu-case li::marker {
+  color: var(--color-orange);
+}
+.contenu-case strong {
+  color: var(--color-orange-clair);
+  font-weight: normal;
+}
+.contenu-case blockquote {
+  border-left: 4px solid var(--color-orange);
+  background: var(--color-gris);
+  padding: 0.6rem 1rem;
+  margin: 0.8rem 0;
+  color: var(--color-creme);
+}
+.contenu-case code {
+  background: var(--color-gris);
+  padding: 0 0.3rem;
+  color: var(--color-orange-clair);
+}
+.contenu-case a {
+  color: var(--color-orange);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clignote,
+  .flotte,
+  .flocon {
+    animation: none;
+  }
+  .flocon {
+    display: none;
+  }
+}
