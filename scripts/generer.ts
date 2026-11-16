@@ -10,9 +10,10 @@
 import { existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { marked } from "marked";
+import { ouvertureDe } from "../src/lib/calendrier.ts";
 import { dechiffrer } from "../src/lib/coffre.ts";
 import type { CaseOuverte, Genere } from "../src/lib/types.ts";
-import { CHEMIN_GENERE, ecrireJson, lireCase, lireChiffre, lireEtat, lireJson } from "./lib/fichiers.ts";
+import { CHEMIN_GENERE, ecrireJson, lireCase, lireChiffre, lireConfig, lireEtat, lireJson } from "./lib/fichiers.ts";
 
 export const fabriquer = (cles: Record<string, string>, apercu: string | null): Genere => {
   const cases: CaseOuverte[] = [];
@@ -41,7 +42,17 @@ const principal = () => {
     console.log("Aperçu en cours : src/generated/cases.json conservé (`pnpm apercu stop` pour revenir au réel).");
     return;
   }
-  const genere = fabriquer(lireEtat().cases, null);
+  // Filet de sécurité : si la config vient de changer (retour en mode normal,
+  // départ décalé…) et que le robot n'est pas encore repassé, on n'embarque
+  // que les cases dues selon la config actuelle.
+  const config = lireConfig();
+  const maintenant = new Date();
+  const cles = Object.fromEntries(
+    Object.entries(lireEtat().cases).filter(([jour]) => ouvertureDe(config, Number(jour)) <= maintenant),
+  );
+  const retenues = Object.keys(lireEtat().cases).filter((jour) => !(jour in cles));
+  if (retenues.length) console.warn(`⚠ Cases ${retenues.join(", ")} retenues : pas encore dues avec la config actuelle (le robot les refermera).`);
+  const genere = fabriquer(cles, null);
   ecrireJson(CHEMIN_GENERE, genere);
   console.log(`✓ ${genere.cases.length} case(s) ouverte(s) embarquée(s) dans le site.`);
 };

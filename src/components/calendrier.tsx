@@ -130,7 +130,7 @@ const Hud = ({ grille, email }: Props) => (
           PROCHAIN : <span className="text-creme">{grille.prochaine}</span>
         </span>
       )}
-      <span>{email ? <span className="text-sapin">● JOUEUR 1 CONNECTE</span> : "○ PAS DE JOUEUR"}</span>
+      <span>{email ? <span className="text-sapin">● JOUEUR 1 CONNECTE</span> : "○ INSERT COIN"}</span>
     </div>
   </div>
 );

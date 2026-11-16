@@ -2,7 +2,8 @@
 #
 # Planifié toutes les 5 minutes (GitHub ne connaît que l'UTC : c'est le script
 # qui calcule l'heure de Paris, donc rien ne s'ouvre jamais trop tôt). Un
-# passage sauté ou retardé est rattrapé au suivant. Bouton manuel :
+# passage sauté ou retardé est rattrapé au suivant. Il se lance aussi à chaque
+# push de la config ou du contenu chiffré. Bouton manuel :
 # onglet Actions → « Robot du calendrier » → Run workflow.
 name: Robot du calendrier
 
@@ -10,6 +11,13 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+  # Un changement de config ou de contenu se répercute tout de suite,
+  # sans attendre le prochain passage planifié.
+  push:
+    branches: [main]
+    paths:
+      - calendrier.config.json
+      - contenu/chiffre/**
 
 permissions:
   contents: write

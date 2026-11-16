@@ -15,13 +15,13 @@ const config = lireConfig();
 const etat = lireEtat();
 const maintenant = new Date();
 
-// 1. Aucune case publiée avant sa date (selon le mode en cours).
-for (const jour of Object.keys(etat.cases).map(Number)) {
-  const ouverture = ouvertureDe(config, jour);
-  if (ouverture > maintenant) {
-    erreurs.push(`La case ${jour} est publiée mais ne doit s'ouvrir que le ${ouverture.toISOString()}.`);
-  }
-}
+// 1. L'état du robot en avance sur la config (la config vient de changer) :
+//    simple avertissement, le site ne les embarque pas (contrôle 2) et le
+//    robot, lancé par le push de la config, les referme.
+const enAvance = Object.keys(etat.cases)
+  .map(Number)
+  .filter((jour) => ouvertureDe(config, jour) > maintenant);
+if (enAvance.length) console.warn(`⚠ Cases ${enAvance.join(", ")} publiées par le robot mais pas encore dues avec la config actuelle : non embarquées.`);
 
 // 2. Le site n'embarque que les cases publiées par le robot, et pas d'aperçu.
 if (existsSync(CHEMIN_GENERE)) {
@@ -29,6 +29,8 @@ if (existsSync(CHEMIN_GENERE)) {
   if (genere.apercu) erreurs.push(`src/generated/cases.json est un aperçu (${genere.apercu}) : lance \`pnpm apercu stop\`.`);
   for (const c of genere.cases) {
     if (!etat.cases[String(c.jour)]) erreurs.push(`Le site embarque la case ${c.jour}, que le robot n'a pas ouverte.`);
+    const ouverture = ouvertureDe(config, c.jour);
+    if (ouverture > maintenant) erreurs.push(`Le site embarque la case ${c.jour}, qui ne doit s'ouvrir que le ${ouverture.toISOString()}.`);
   }
   if (genere.manquantes.length) erreurs.push(`Cases ouvertes illisibles : ${genere.manquantes.join(", ")}.`);
 }
@@ -41,4 +43,5 @@ if (erreurs.length) {
   console.error(`✗ Vérification échouée :\n  ${erreurs.join("\n  ")}`);
   process.exit(1);
 }
-console.log(`✓ Vérification réussie : ${Object.keys(etat.cases).length} case(s) publiée(s), aucune en avance.`);
+const embarquees = existsSync(CHEMIN_GENERE) ? lireJson<Genere>(CHEMIN_GENERE).cases.length : 0;
+console.log(`✓ Vérification réussie : ${embarquees} case(s) dans le site, aucune en avance.`);
