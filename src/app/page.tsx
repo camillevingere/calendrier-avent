@@ -31,7 +31,7 @@ export default async function Accueil() {
           </p>
           <p className="max-w-2xl text-xl text-gris-clair sm:text-2xl">
             24 skills IA testés et expliqués pour faire gagner du temps à ta PME. Un niveau se débloque
-            chaque matin de décembre.
+            chaque jour de décembre, à minuit pile.
           </p>
         </header>
 

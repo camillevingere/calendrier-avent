@@ -84,5 +84,5 @@ export const estTermine = (config: Config, maintenant: Date): boolean =>
 const formatJour = new Intl.DateTimeFormat("fr-FR", { timeZone: FUSEAU, day: "numeric", month: "short" });
 const formatHeure = new Intl.DateTimeFormat("fr-FR", { timeZone: FUSEAU, hour: "2-digit", minute: "2-digit" });
 
-/** "7 déc. à 07:00" — l'heure d'ouverture affichée au visiteur. */
+/** "7 déc. à 00:00" — l'heure d'ouverture affichée au visiteur. */
 export const libelleOuverture = (date: Date): string => `${formatJour.format(date)} à ${formatHeure.format(date)}`;

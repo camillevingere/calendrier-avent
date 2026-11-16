@@ -1,6 +1,6 @@
 # 🎄 Skill Quest — le calendrier de l'Avent IA de Fyliz
 
-24 skills IA (Claude Code, Codex, Cursor…) choisis pour les PME et les entrepreneurs : un niveau se débloque chaque matin de décembre à 7 h, heure de Paris. Pour jouer, on entre son email : il part dans Lumail avec le tag `calendrier-avent`.
+24 skills IA (Claude Code, Codex, Cursor…) choisis pour les PME et les entrepreneurs : un niveau se débloque chaque jour de décembre à minuit, heure de Paris. Pour jouer, on entre son email : il part dans Lumail avec le tag `calendrier-avent`.
 
 Next.js 16, aucune base de données, hébergé sur Vercel.
 
@@ -45,7 +45,7 @@ Le site : grille de 24 cases, contenu servi seulement aux inscrits (cookie sign�
 { "mode": "normal", "accelere": { "depart": "2026-11-16T20:30:00+01:00", "intervalleMinutes": 5 } }
 ```
 
-- `"normal"` : la case N s'ouvre le N décembre à 07:00, heure de Paris.
+- `"normal"` : la case N s'ouvre le N décembre à 00:00, heure de Paris.
 - `"accelere"` (mode soirée) : la case N s'ouvre à `depart + (N-1) × 5 min`. Commite, pousse, et le robot suit.
 
 Le robot peut aussi être lancé à la main : onglet **Actions → Robot du calendrier → Run workflow**. Chaque passage note dans son journal l'heure (UTC et Paris), le mode, les cases ouvertes et ce qu'il a fait. En cas d'échec (clé absente, case illisible), le job devient rouge et GitHub envoie un email.

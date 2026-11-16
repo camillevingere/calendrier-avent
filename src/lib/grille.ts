@@ -3,7 +3,7 @@
  *
  * L'ouverture d'une case ne dépend que de ce que le robot a publié (le fichier
  * fabriqué au build), jamais de l'horloge du visiteur. L'horloge du serveur ne
- * sert qu'aux libellés : « case du jour », « s'ouvre le 7 déc. à 07:00 ».
+ * sert qu'aux libellés : « case du jour », « s'ouvre le 7 déc. à 00:00 ».
  */
 import config from "../../calendrier.config.json" with { type: "json" };
 import genereBrut from "../generated/cases.json" with { type: "json" };
@@ -18,7 +18,7 @@ export type EtatCase = "ouverte" | "jour" | "fermee";
 export type CaseAffichee = {
   jour: number;
   etat: EtatCase;
-  /** "7 déc. à 07:00" pour une case fermée. */
+  /** "7 déc. à 00:00" pour une case fermée. */
   ouverture: string;
   /** Présent seulement pour une case ouverte ET un visiteur inscrit. */
   contenu: CaseOuverte | null;
