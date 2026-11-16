@@ -114,41 +114,65 @@ export const Decor = () => {
     return () => clearTimeout(t);
   }, [annonce]);
 
-  const trouver = useCallback((secret: Secret, texte: string) => {
-    setTrouves((avant) => {
+  const trouvesRef = useRef<Secret[]>([]);
+  useEffect(() => {
+    trouvesRef.current = trouves;
+  }, [trouves]);
+
+  const declencherTempete = useCallback((duree: number) => {
+    setTempete(true);
+    document.body.classList.add("secousse");
+    setTimeout(() => document.body.classList.remove("secousse"), 700);
+    setTimeout(() => setTempete(false), duree);
+  }, []);
+
+  const trouver = useCallback(
+    (secret: Secret, texte: string) => {
+      const avant = trouvesRef.current;
       if (avant.includes(secret)) {
         setAnnonce(texte);
-        return avant;
+        return;
       }
       const apres = [...avant, secret];
+      trouvesRef.current = apres;
+      setTrouves(apres);
       try {
         localStorage.setItem(CLE_STOCKAGE, JSON.stringify(apres));
       } catch {}
       if (apres.length === TOTAL) {
         setAnnonce(`★ 100% ★ Tous les secrets trouvés ! Vrai joueur. Ton skill secret t'attend dans ta boîte mail.`);
         setCouleur("fete");
-        setTempete(true);
-        setTimeout(() => setTempete(false), 9000);
+        declencherTempete(9000);
       } else {
         setAnnonce(`★ SECRET ${apres.length}/${TOTAL} : ${SECRETS[secret]} — ${texte}`);
       }
-      return apres;
-    });
-  }, []);
+    },
+    [declencherTempete],
+  );
 
   // Clavier : Konami code et mot magique (ignorés quand on tape dans un champ).
   useEffect(() => {
-    let konami = 0;
+    let dernieres: string[] = [];
     let mot = "";
     const touche = (e: KeyboardEvent) => {
       const cible = e.target as HTMLElement | null;
       if (cible && (cible.tagName === "INPUT" || cible.tagName === "TEXTAREA" || cible.isContentEditable)) return;
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      konami = k === KONAMI[konami] ? konami + 1 : k === KONAMI[0] ? 1 : 0;
-      if (konami === KONAMI.length) {
-        konami = 0;
-        setTempete(true);
-        setTimeout(() => setTempete(false), 8000);
+      // On garde les 10 dernières touches : une touche en trop ne casse pas la séquence.
+      dernieres = [...dernieres, k].slice(-KONAMI.length);
+      // Dès ↑↑↓, on considère le code commencé : les flèches arrêtent de faire défiler la page.
+      const avancee = dernieres.reduce(
+        (max, _, debut) => {
+          const fin = dernieres.slice(debut);
+          return fin.every((t, i) => t === KONAMI[i]) ? Math.max(max, fin.length) : max;
+        },
+        0,
+      );
+      if (avancee >= 3 && k.startsWith("Arrow") && !document.querySelector("dialog[open]")) e.preventDefault();
+      if (dernieres.join() === KONAMI.join()) {
+        dernieres = [];
+        declencherTempete(8000);
         trouver("konami", "CHEAT CODE ACTIVÉ : +30 vies et tempête de neige !");
       }
       if (k.length === 1) {
@@ -161,7 +185,7 @@ export const Decor = () => {
     };
     window.addEventListener("keydown", touche);
     return () => window.removeEventListener("keydown", touche);
-  }, [trouver]);
+  }, [trouver, declencherTempete]);
 
   // Un mot pour ceux qui fouillent la console.
   useEffect(() => {

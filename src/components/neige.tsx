@@ -19,11 +19,11 @@ export const Neige = ({ tempete = false, couleur = "creme" }: { tempete?: boolea
     {(tempete ? TEMPETE : NORMAL).map((f, i) => (
       <span
         key={i}
-        className="flocon"
+        className={tempete ? "flocon flocon-tempete" : "flocon"}
         style={{
           left: `${f.left}%`,
-          width: f.taille,
-          height: f.taille,
+          width: tempete ? f.taille + 2 : f.taille,
+          height: tempete ? f.taille + 2 : f.taille,
           animationDuration: `${tempete ? f.duree / 3 : f.duree}s`,
           animationDelay: `${f.delai}s`,
           background:
