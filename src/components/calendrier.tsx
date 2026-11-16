@@ -67,7 +67,7 @@ export const Calendrier = ({ grille, email }: Props) => {
           <div className="pixel bg-ardoise p-5 sm:p-8">
             <PorteEmail
               titre="INSERT COIN"
-              texte="Entre ton email pour jouer. Tu débloques les 24 niveaux au fil de décembre, et cet appareil s'en souviendra."
+              texte="Entre ton email pour jouer : les 24 niveaux se débloquent ici, sur le site, et cet appareil s'en souviendra."
               onInscrit={() => setPorteOuverte(false)}
             />
           </div>
@@ -96,7 +96,7 @@ export const Calendrier = ({ grille, email }: Props) => {
       <Fenetre ouverte={porteOuverte} onFermer={() => setPorteOuverte(false)} titre="Insérer une pièce">
         <PorteEmail
           titre="INSERT COIN"
-          texte="Ce niveau est débloqué ! Entre ton email pour l'ouvrir. Tu n'auras plus à le faire sur cet appareil."
+          texte="Ce niveau est débloqué ! Entre ton email pour l'ouvrir : tu n'auras plus à le faire sur cet appareil."
           onInscrit={() => setPorteOuverte(false)}
         />
       </Fenetre>
@@ -252,14 +252,18 @@ const PorteEmail = ({ titre, texte, onInscrit }: { titre: string; texte: string;
           {envoi ? "CHARGEMENT…" : "JOUER ▶"}
         </button>
       </div>
+      <p className="pixel bg-nuit px-3 py-2 text-lg leading-snug text-orange-clair [--bord:var(--color-orange-sombre)]">
+        🎁 NIVEAU SECRET : un skill exclusif, introuvable sur le site, t&apos;attend dans ta boîte mail. Pense à
+        ouvrir l&apos;email de Fyliz !
+      </p>
       {erreur && (
         <p role="alert" className="text-xl text-[#ff6b6b]">
           ✗ {erreur}
         </p>
       )}
       <p className="text-base leading-snug text-gris-clair">
-        En jouant, tu reçois aussi les emails de Fyliz (conseils IA et automatisation pour PME). Désinscription en un
-        clic, à tout moment.
+        Pas un email par jour : tout se passe sur le site. Tu reçois ton skill secret, puis de temps en temps des
+        conseils IA et automatisation de Fyliz. Désinscription en un clic.
       </p>
     </form>
   );
