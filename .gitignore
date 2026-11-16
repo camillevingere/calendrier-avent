@@ -1,0 +1,25 @@
+# Dépendances et fabrication
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# Secrets : jamais dans Git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Contenu en clair des 24 cases : reste sur ton ordinateur, seul le chiffré part sur GitHub
+contenu/source/
+
+# Fichier fabriqué au build (cases ouvertes déchiffrées)
+src/generated/
+
+# Système
+.DS_Store
+Thumbs.db
