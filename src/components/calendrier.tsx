@@ -254,7 +254,7 @@ const PorteEmail = ({ titre, texte, onInscrit }: { titre: string; texte: string;
         </button>
       </div>
       <p className="pixel bg-nuit px-3 py-2 text-lg leading-snug text-orange-clair [--bord:var(--color-orange-sombre)]">
-        🎁 NIVEAU SECRET : un skill exclusif, introuvable sur le site, t&apos;attend dans ta boîte mail. Pense à
+        🎁 BONUS : un skill exclusif, introuvable sur le site, t&apos;attend dans ta boîte mail. Pense à
         ouvrir l&apos;email de Fyliz !
       </p>
       {erreur && (
@@ -263,14 +263,14 @@ const PorteEmail = ({ titre, texte, onInscrit }: { titre: string; texte: string;
         </p>
       )}
       <p className="text-base leading-snug text-gris-clair">
-        Pas un email par jour : tout se passe sur le site. Tu reçois ton skill secret, puis de temps en temps des
+        Pas un email par jour : tout se passe sur le site. Tu reçois ton skill exclusif, puis de temps en temps des
         conseils IA et automatisation de Fyliz. Désinscription en un clic.
       </p>
     </form>
   );
 };
 
-const Fenetre = ({
+export const Fenetre = ({
   ouverte,
   onFermer,
   titre,

@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Neige, type CouleurNeige } from "./neige";
+import { NiveauBonus } from "./niveau-bonus";
 import { PixelArt } from "./pixel-art";
 
 const SECRETS = {
@@ -97,6 +98,7 @@ export const Decor = () => {
   const [sapinAllume, setSapinAllume] = useState(false);
   const [lumiere, setLumiere] = useState(true);
   const [luneFyliz, setLuneFyliz] = useState(false);
+  const [bonusOuvert, setBonusOuvert] = useState(false);
   const clicsLune = useRef(0);
 
   useEffect(() => {
@@ -140,9 +142,10 @@ export const Decor = () => {
         localStorage.setItem(CLE_STOCKAGE, JSON.stringify(apres));
       } catch {}
       if (apres.length === TOTAL) {
-        setAnnonce(`★ 100% ★ Tous les secrets trouvés ! Vrai joueur. Ton skill secret t'attend dans ta boîte mail.`);
+        setAnnonce(`★ 100% ★ Tous les secrets trouvés ! NIVEAU BONUS débloqué…`);
         setCouleur("fete");
         declencherTempete(9000);
+        setTimeout(() => setBonusOuvert(true), 2500);
       } else {
         setAnnonce(`★ SECRET ${apres.length}/${TOTAL} : ${SECRETS[secret]} — ${texte}`);
       }
@@ -206,6 +209,7 @@ export const Decor = () => {
   };
 
   return (
+    <>
     <div aria-hidden="true">
       {/* Étoiles */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -304,12 +308,24 @@ export const Decor = () => {
         />
       </button>
 
-      {/* Compteur et annonces */}
-      {trouves.length > 0 && (
+    </div>
+
+      {/* Compteur (cliquable une fois les 6 trouvés) et annonces */}
+      {trouves.length > 0 && trouves.length < TOTAL && (
         <p className="pointer-events-none fixed bottom-7 left-1/2 z-30 -translate-x-1/2 font-pixel text-[0.5rem] text-orange-clair xl:bottom-4 xl:left-24 xl:translate-x-0">
           ★ SECRETS {trouves.length}/{TOTAL}
         </p>
       )}
+      {trouves.length === TOTAL && (
+        <button
+          type="button"
+          onClick={() => setBonusOuvert(true)}
+          className="clignote-lent fixed bottom-7 left-1/2 z-30 -translate-x-1/2 cursor-pointer whitespace-nowrap font-pixel text-[0.5rem] text-sapin hover:text-orange xl:bottom-4 xl:left-24 xl:translate-x-0"
+        >
+          ★ {TOTAL}/{TOTAL} · NIVEAU BONUS ▶
+        </button>
+      )}
+      <NiveauBonus ouvert={bonusOuvert} onFermer={() => setBonusOuvert(false)} />
       {annonce && (
         <p
           role="status"
@@ -318,6 +334,6 @@ export const Decor = () => {
           {annonce}
         </p>
       )}
-    </div>
+    </>
   );
 };

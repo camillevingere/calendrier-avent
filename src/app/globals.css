@@ -146,6 +146,10 @@ body.secousse > * {
   animation: secousse 0.35s steps(2) 2;
 }
 
+.clignote-lent {
+  animation: clignote 1.6s steps(1) infinite;
+}
+
 /* Décor de fond */
 @keyframes scintille {
   0%, 100% { opacity: 0.25; }
@@ -269,6 +273,7 @@ dialog::backdrop {
 
 @media (prefers-reduced-motion: reduce) {
   .clignote,
+  .clignote-lent,
   .flotte,
   .flocon,
   .scintille,
