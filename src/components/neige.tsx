@@ -1,14 +1,22 @@
 /** Neige en pixels, décorative. Positions déterministes pour un rendu stable. */
-const FLOCONS = Array.from({ length: 36 }, (_, i) => ({
-  left: (i * 37) % 100,
-  duree: 9 + ((i * 7) % 11),
-  delai: -((i * 13) % 20),
-  taille: i % 5 === 0 ? 6 : 4,
-}));
+export type CouleurNeige = "creme" | "orange" | "fete";
 
-export const Neige = () => (
+const FETE = ["#ff781a", "#ffcc33", "#3ddc84", "#ff4d6d", "#4dc9ff", "#fff4e8"];
+
+const flocons = (nombre: number) =>
+  Array.from({ length: nombre }, (_, i) => ({
+    left: (i * 37 + (i % 3) * 11) % 100,
+    duree: 9 + ((i * 7) % 11),
+    delai: -((i * 13) % 20),
+    taille: i % 5 === 0 ? 6 : 4,
+  }));
+
+const NORMAL = flocons(36);
+const TEMPETE = flocons(110);
+
+export const Neige = ({ tempete = false, couleur = "creme" }: { tempete?: boolean; couleur?: CouleurNeige }) => (
   <div aria-hidden="true">
-    {FLOCONS.map((f, i) => (
+    {(tempete ? TEMPETE : NORMAL).map((f, i) => (
       <span
         key={i}
         className="flocon"
@@ -16,8 +24,11 @@ export const Neige = () => (
           left: `${f.left}%`,
           width: f.taille,
           height: f.taille,
-          animationDuration: `${f.duree}s`,
+          animationDuration: `${tempete ? f.duree / 3 : f.duree}s`,
           animationDelay: `${f.delai}s`,
+          background:
+            couleur === "fete" ? FETE[i % FETE.length] : couleur === "orange" ? "var(--color-orange)" : undefined,
+          opacity: couleur === "creme" ? undefined : 0.9,
         }}
       />
     ))}

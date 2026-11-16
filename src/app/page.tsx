@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { Calendrier } from "@/components/calendrier";
-import { Neige } from "@/components/neige";
+import { Decor } from "@/components/decor";
 import { COOKIE_ACCES, lireTicket } from "@/lib/acces";
 import { construireGrille } from "@/lib/grille";
 
@@ -13,7 +13,7 @@ export default async function Accueil() {
 
   return (
     <>
-      <Neige />
+      <Decor />
       <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
         <header className="flex flex-col items-center gap-4 text-center">
           <a
@@ -37,7 +37,7 @@ export default async function Accueil() {
 
         <Calendrier grille={grille} email={email} />
 
-        <footer className="flex flex-col items-center gap-2 pb-8 text-center text-lg text-gris-clair">
+        <footer className="flex flex-col items-center gap-2 pb-28 text-center text-lg text-gris-clair">
           <p>
             Les cases fermées ne sont pas dans cette page : elles sont chiffrées, et c&apos;est un robot qui
             publie la clé du jour. Inutile de fouiller le code source 😉
@@ -49,6 +49,7 @@ export default async function Accueil() {
             </a>
             , ton équipe IA externalisée.
           </p>
+          <p className="text-base">Psst… 6 secrets se cachent sur cette page. Les curieux qui fouillent le code ont un indice 😉</p>
         </footer>
       </main>
     </>

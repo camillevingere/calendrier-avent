@@ -123,6 +123,74 @@ body::after {
   z-index: 0;
 }
 
+/* Décor de fond */
+@keyframes scintille {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.scintille {
+  animation: scintille 3s steps(3) infinite;
+}
+
+@keyframes filante {
+  0% { transform: translate(0, 0); opacity: 0; }
+  1% { opacity: 1; }
+  7% { transform: translate(260px, 130px); opacity: 0; }
+  100% { transform: translate(260px, 130px); opacity: 0; }
+}
+.filante {
+  position: absolute;
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(to left, var(--color-creme), transparent);
+  transform-origin: right;
+  rotate: 26deg;
+  opacity: 0;
+  animation: filante 16s linear infinite;
+}
+
+@keyframes traineau {
+  0% { transform: translate(-160px, 0); }
+  8% { transform: translate(25vw, -14px); }
+  16% { transform: translate(50vw, 6px); }
+  24% { transform: translate(75vw, -10px); }
+  32%, 100% { transform: translate(calc(100vw + 40px), 0); }
+}
+.traineau {
+  animation: traineau 45s linear infinite;
+  animation-delay: 4s;
+  transform: translate(-160px, 0);
+}
+
+.lune {
+  filter: drop-shadow(0 0 18px rgb(255 244 232 / 0.35));
+}
+
+.sol {
+  background:
+    linear-gradient(to bottom, transparent 0 4px, rgb(255 244 232 / 0.85) 4px),
+    repeating-linear-gradient(to right, rgb(255 244 232 / 0.85) 0 12px, transparent 12px 20px);
+  background-size: 100% 100%, 100% 4px;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+
+.sapin-allume {
+  filter: drop-shadow(0 0 10px rgb(255 204 51 / 0.6));
+  animation: clignote-doux 1.6s steps(2) infinite;
+}
+@keyframes clignote-doux {
+  50% { filter: drop-shadow(0 0 4px rgb(255 120 26 / 0.5)); }
+}
+
+@keyframes pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.pop {
+  animation: pop 180ms steps(3);
+}
+
 :focus-visible {
   outline: 3px dashed var(--color-orange-clair);
   outline-offset: 3px;
@@ -179,8 +247,15 @@ dialog::backdrop {
 @media (prefers-reduced-motion: reduce) {
   .clignote,
   .flotte,
-  .flocon {
+  .flocon,
+  .scintille,
+  .sapin-allume,
+  .pop {
     animation: none;
+  }
+  .filante,
+  .traineau {
+    display: none;
   }
   .flocon {
     display: none;
