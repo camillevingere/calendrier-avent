@@ -77,7 +77,7 @@ export const Calendrier = ({ grille, email }: Props) => {
       <ol className="grid grid-cols-3 gap-3 min-[420px]:grid-cols-4 sm:grid-cols-6 sm:gap-4 lg:grid-cols-8">
         {grille.cases.map((c) => (
           <li key={c.jour}>
-            <CaseBouton c={c} onClick={() => choisir(c)} />
+            <CaseBouton c={c} accelere={grille.mode === "accelere"} onClick={() => choisir(c)} />
           </li>
         ))}
       </ol>
@@ -141,7 +141,7 @@ const STYLE_ETAT = {
   jour: "bg-orange text-nuit [--bord:var(--color-orange-clair)]",
 } as const;
 
-const CaseBouton = ({ c, onClick }: { c: CaseAffichee; onClick: () => void }) => {
+const CaseBouton = ({ c, accelere, onClick }: { c: CaseAffichee; accelere: boolean; onClick: () => void }) => {
   const libelle =
     c.etat === "fermee"
       ? `Case ${c.jour}, fermée, s'ouvre le ${c.ouverture}`
@@ -165,7 +165,8 @@ const CaseBouton = ({ c, onClick }: { c: CaseAffichee; onClick: () => void }) =>
           {c.manquante ? (
             <span className="bg-[#ff3b3b] px-1 text-nuit">CONTENU MANQUANT</span>
           ) : c.etat === "fermee" ? (
-            c.ouverture.replace(/ à .*/, "")
+            // En soirée, toutes les cases tombent le même jour : on montre l'heure.
+            accelere ? c.ouverture.replace(/^.* à /, "") : c.ouverture.replace(/ à .*/, "")
           ) : c.etat === "jour" ? (
             <span className="clignote">JOUR J</span>
           ) : (
