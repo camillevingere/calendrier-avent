@@ -47,7 +47,7 @@ export const Calendrier = ({ grille, email }: Props) => {
 
       {grille.apercu && (
         <Bandeau ton="info">
-          APERÇU LOCAL AU {grille.apercu} — `pnpm apercu stop` pour revenir à l&apos;état réel.
+          APERCU LOCAL AU {grille.apercu} — `pnpm apercu stop` pour revenir à l&apos;état réel.
         </Bandeau>
       )}
       {grille.termine && (
@@ -124,13 +124,13 @@ const Hud = ({ grille, email }: Props) => (
       </span>
     </div>
     <div className="flex flex-wrap gap-x-5 gap-y-2 text-gris-clair">
-      {grille.mode === "accelere" && <span className="clignote text-orange">⏩ MODE SOIRÉE</span>}
+      {grille.mode === "accelere" && <span className="clignote text-orange">⏩ MODE SOIREE</span>}
       {grille.prochaine && !grille.termine && (
         <span>
           PROCHAIN : <span className="text-creme">{grille.prochaine}</span>
         </span>
       )}
-      <span>{email ? <span className="text-sapin">● JOUEUR 1 CONNECTÉ</span> : "○ PAS DE JOUEUR"}</span>
+      <span>{email ? <span className="text-sapin">● JOUEUR 1 CONNECTE</span> : "○ PAS DE JOUEUR"}</span>
     </div>
   </div>
 );
@@ -346,7 +346,7 @@ const ContenuCase = ({ c }: { c: CaseAffichee }) => {
             $ {contenu.installation}
           </code>
           <button type="button" onClick={copier} className="bouton-pixel shrink-0 px-3 py-2 text-[0.55rem]">
-            {copie ? "COPIÉ ✓" : "COPIER"}
+            {copie ? "COPIE ✓" : "COPIER"}
           </button>
         </div>
       </div>

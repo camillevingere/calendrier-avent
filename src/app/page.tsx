@@ -20,14 +20,14 @@ export default async function Accueil() {
             href="https://fyliz.com"
             className="font-pixel text-[0.6rem] tracking-[0.3em] text-gris-clair hover:text-orange sm:text-xs"
           >
-            FYLIZ PRÉSENTE
+            FYLIZ PRESENTE
           </a>
           <h1 className="texte-neon font-pixel text-3xl leading-tight text-orange sm:text-5xl md:text-6xl">
             SKILL
             <br className="sm:hidden" /> QUEST
           </h1>
           <p className="font-pixel text-[0.6rem] leading-relaxed text-creme sm:text-xs">
-            LE CALENDRIER DE L&apos;AVENT IA · ÉDITION {new Date().getFullYear()}
+            LE CALENDRIER DE L&apos;AVENT IA · EDITION {new Date().getFullYear()}
           </p>
           <p className="max-w-2xl text-xl text-gris-clair sm:text-2xl">
             24 skills IA testés et expliqués pour faire gagner du temps à ta PME. Un niveau se débloque
