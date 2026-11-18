@@ -1,11 +1,4 @@
 {
-  "mode": "accelere",
-  "cases": {
-    "1": "rr5pk6veNKwgQtu29ipLOLM/rENcU+81XG16+iIxp4Y=",
-    "2": "Txl1jj2wRVRu/AwWMjP9VsjT6qDsmZ/sZBc5dwCfg1c=",
-    "3": "QalkaCXXksjTgk0ZQ2A2OSdD6ilT7G+LyXr8Bq/HTiU=",
-    "4": "zWM1Rc48dPgIMApL8PPjAWocT4R2D7IlRVmMV8iy0uk=",
-    "5": "t4AvGeo8fbmoTXjQ9/FIuX1KNBZ+76EucuKw1wulAg0=",
-    "6": "k6j4YofubyFjdDnG325qlgIjlRM2Peth50Wvjk7Kq7o="
-  }
+  "mode": "normal",
+  "cases": {}
 }
