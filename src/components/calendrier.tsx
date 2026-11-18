@@ -1,24 +1,99 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import type { CaseAffichee, Grille } from "@/lib/grille";
+import { reglerSon, sonActif, sonPowerUp, sonVerrou } from "@/lib/son";
+import { Fenetre } from "./fenetre";
+import { useSecrets } from "./secrets";
+import { VoyageNiveaux } from "./voyage-niveaux";
 
 type Props = { grille: Grille; email: string | null };
+
+const CLE_VUS = "skill-quest-vus";
+
+/** La 3D est réservée aux appareils qui la supportent et aux visiteurs qui acceptent les animations. */
+const peut3D = (): boolean => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
+  } catch {
+    return false;
+  }
+};
+
+const indexDeDepart = (grille: Grille): number => {
+  const duJour = grille.cases.findIndex((c) => c.etat === "jour");
+  if (duJour >= 0) return duJour;
+  const ouvertes = grille.cases.filter((c) => c.etat !== "fermee");
+  return ouvertes.length ? ouvertes[ouvertes.length - 1].jour - 1 : 0;
+};
 
 export const Calendrier = ({ grille, email }: Props) => {
   const [ouverte, setOuverte] = useState<number | null>(null);
   const [porteOuverte, setPorteOuverte] = useState(false);
   const [aOuvrirApresInscription, setAOuvrirApresInscription] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [vue, setVue] = useState<"3d" | "grille" | null>(null);
+  const [vus, setVus] = useState<Set<number>>(new Set());
+  const [assemblage, setAssemblage] = useState<{ jour: number; cle: number } | null>(null);
+  const [son, setSon] = useState(true);
+  const secrets = useSecrets();
+  const { setImmersif } = secrets;
+
+  // En passant d'une vue à l'autre, on repart du haut : l'écran titre ouvre le voyage.
+  const vuePrecedente = useRef(vue);
+  useEffect(() => {
+    setImmersif(vue === "3d");
+    if (vuePrecedente.current !== vue) window.scrollTo({ top: 0 });
+    vuePrecedente.current = vue;
+  }, [vue, setImmersif]);
+
+  useEffect(() => {
+    setVue(peut3D() ? "3d" : "grille");
+    setSon(sonActif());
+    try {
+      setVus(new Set(JSON.parse(localStorage.getItem(CLE_VUS) ?? "[]") as number[]));
+    } catch {
+      // Pas de stockage : chaque visite redéballe les objets, ce n'est pas grave.
+    }
+  }, []);
+
+  /** Déballer un niveau : l'objet s'assemble, puis la fiche du skill s'ouvre. */
+  const deballer = useCallback(
+    (jour: number) => {
+      if (vue !== "3d" || vus.has(jour)) {
+        setOuverte(jour);
+        return;
+      }
+      setOuverte(null);
+      setAssemblage({ jour, cle: Date.now() });
+      sonPowerUp();
+    },
+    [vue, vus],
+  );
+
+  const finAssemblage = useCallback((jour: number) => {
+    setVus((avant) => {
+      const apres = new Set(avant).add(jour);
+      try {
+        localStorage.setItem(CLE_VUS, JSON.stringify([...apres]));
+      } catch {
+        // Idem : la mémoire ne vaut que pour cette visite.
+      }
+      return apres;
+    });
+    setOuverte(jour);
+  }, []);
 
   // Après l'inscription, la page est rechargée côté serveur avec le contenu : on ouvre la case demandée.
   useEffect(() => {
     if (email && aOuvrirApresInscription) {
-      setOuverte(aOuvrirApresInscription);
+      deballer(aOuvrirApresInscription);
       setAOuvrirApresInscription(null);
     }
-  }, [email, aOuvrirApresInscription]);
+  }, [email, aOuvrirApresInscription, deballer]);
 
   useEffect(() => {
     if (!message) return;
@@ -29,6 +104,7 @@ export const Calendrier = ({ grille, email }: Props) => {
   const choisir = (c: CaseAffichee) => {
     if (c.etat === "fermee") {
       setMessage(`🔒 Niveau ${c.jour} verrouillé. Il se débloque le ${c.ouverture}.`);
+      sonVerrou();
       return;
     }
     if (!email) {
@@ -36,14 +112,33 @@ export const Calendrier = ({ grille, email }: Props) => {
       setPorteOuverte(true);
       return;
     }
-    setOuverte(c.jour);
+    deballer(c.jour);
   };
 
   const caseOuverte = grille.cases.find((c) => c.jour === ouverte) ?? null;
 
+  const commandes = (
+    <>
+      <button type="button" className="hover:text-orange" onClick={() => setVue(vue === "3d" ? "grille" : "3d")}>
+        {vue === "3d" ? "▦ VUE GRILLE" : "◆ MONDE 3D"}
+      </button>
+      <button
+        type="button"
+        className="hover:text-orange"
+        aria-pressed={son}
+        onClick={() => {
+          reglerSon(!son);
+          setSon(!son);
+        }}
+      >
+        {son ? "♪ SON : ON" : "♪ SON : OFF"}
+      </button>
+    </>
+  );
+
   return (
     <section className="flex flex-col gap-6" aria-label="Calendrier">
-      <Hud grille={grille} email={email} />
+      <Hud grille={grille} email={email} fixe={vue === "3d"} />
 
       {grille.apercu && (
         <Bandeau ton="info">
@@ -63,8 +158,11 @@ export const Calendrier = ({ grille, email }: Props) => {
       )}
 
       {!email && (
-        <div className="ombre-pixel">
-          <div className="pixel bg-ardoise p-5 sm:p-8">
+        <div
+          id="porte-email"
+          className={vue === "3d" ? "interactif ombre-pixel mx-auto my-[20svh] w-full max-w-3xl scroll-mt-28" : "ombre-pixel"}
+        >
+          <div className="pixel bg-ardoise/90 p-5 backdrop-blur-sm sm:p-8">
             <PorteEmail
               titre="INSERT COIN"
               texte="Entre ton email pour jouer : les 24 niveaux se débloquent ici, sur le site, et cet appareil s'en souviendra."
@@ -74,20 +172,49 @@ export const Calendrier = ({ grille, email }: Props) => {
         </div>
       )}
 
-      <ol className="grid grid-cols-3 gap-3 min-[420px]:grid-cols-4 sm:grid-cols-6 sm:gap-4 lg:grid-cols-8">
-        {grille.cases.map((c) => (
-          <li key={c.jour}>
-            <CaseBouton c={c} accelere={grille.mode === "accelere"} onClick={() => choisir(c)} />
-          </li>
-        ))}
-      </ol>
+      {vue === "3d" ? (
+        <VoyageNiveaux
+          cases={grille.cases}
+          vus={vus}
+          inscrit={email !== null}
+          assemblage={assemblage}
+          secrets={secrets}
+          depart={indexDeDepart(grille)}
+          commandes={commandes}
+          onChoisir={choisir}
+          onFinAssemblage={finAssemblage}
+        />
+      ) : (
+        <>
+          <ol className="grid grid-cols-3 gap-3 min-[420px]:grid-cols-4 sm:grid-cols-6 sm:gap-4 lg:grid-cols-8">
+            {grille.cases.map((c) => (
+              <li key={c.jour}>
+                <CaseBouton c={c} accelere={grille.mode === "accelere"} onClick={() => choisir(c)} />
+              </li>
+            ))}
+          </ol>
+          <Legende />
+          {vue !== null && (
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-pixel text-[0.55rem] text-gris-clair">
+              {commandes}
+            </div>
+          )}
+        </>
+      )}
 
-      <Legende />
+      <Fenetre
+        ouverte={caseOuverte !== null}
+        onFermer={() => setOuverte(null)}
+        titre={caseOuverte ? `Niveau ${caseOuverte.jour}` : "Niveau"}
+        variante={vue === "3d" ? "tiroir" : "centre"}
+      >
+        {caseOuverte && <ContenuCase c={caseOuverte} />}
+      </Fenetre>
 
       {message && (
         <div
           role="status"
-          className="pixel fixed inset-x-4 bottom-4 z-40 mx-auto max-w-md bg-nuit p-3 text-center text-xl sm:bottom-8"
+          className="pixel fixed! inset-x-4 bottom-4 z-40 mx-auto max-w-md bg-nuit p-3 text-center text-xl sm:bottom-8"
         >
           {message}
         </div>
@@ -100,20 +227,14 @@ export const Calendrier = ({ grille, email }: Props) => {
           onInscrit={() => setPorteOuverte(false)}
         />
       </Fenetre>
-
-      <Fenetre
-        ouverte={caseOuverte !== null}
-        onFermer={() => setOuverte(null)}
-        titre={caseOuverte?.contenu?.titre ?? "Case"}
-      >
-        {caseOuverte && <ContenuCase c={caseOuverte} />}
-      </Fenetre>
     </section>
   );
 };
 
-const Hud = ({ grille, email }: Props) => (
-  <div className="pixel flex flex-col gap-3 bg-ardoise px-4 py-3 font-pixel text-[0.6rem] leading-relaxed sm:flex-row sm:items-center sm:justify-between sm:text-[0.65rem]">
+const Hud = ({ grille, email, fixe }: Props & { fixe: boolean }) => (
+  <div
+    className={`pixel flex flex-col gap-3 px-4 py-3 ${fixe ? "fixed! inset-x-3 top-3 z-30 mx-auto max-w-6xl bg-nuit/80 backdrop-blur-sm sm:inset-x-6" : "bg-ardoise"} font-pixel text-[0.6rem] leading-relaxed sm:flex-row sm:items-center sm:justify-between sm:text-[0.65rem]`}
+  >
     <div className="flex items-center gap-3">
       <span className="text-orange">NIVEAU</span>
       <span>
@@ -267,49 +388,6 @@ const PorteEmail = ({ titre, texte, onInscrit }: { titre: string; texte: string;
         conseils IA et automatisation de Fyliz. Désinscription en un clic.
       </p>
     </form>
-  );
-};
-
-export const Fenetre = ({
-  ouverte,
-  onFermer,
-  titre,
-  children,
-}: {
-  ouverte: boolean;
-  onFermer: () => void;
-  titre: string;
-  children: React.ReactNode;
-}) => {
-  const ref = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    if (ouverte && !d.open) d.showModal();
-    if (!ouverte && d.open) d.close();
-  }, [ouverte]);
-
-  return (
-    <dialog
-      ref={ref}
-      aria-label={titre}
-      onClose={onFermer}
-      onClick={(e) => e.target === ref.current && onFermer()}
-      className="m-auto max-h-[90dvh] w-[min(46rem,calc(100vw-2rem))] bg-transparent p-0 text-creme"
-    >
-      <div className="pixel max-h-[90dvh] overflow-y-auto bg-ardoise p-5 sm:p-8">
-        <button
-          type="button"
-          onClick={onFermer}
-          className="float-right ml-4 font-pixel text-xs text-gris-clair hover:text-orange"
-          aria-label="Fermer"
-        >
-          [X]
-        </button>
-        {children}
-      </div>
-    </dialog>
   );
 };
 

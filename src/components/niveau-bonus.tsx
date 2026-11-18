@@ -6,7 +6,7 @@
  * et ceux qui fouillent le code jusqu'ici l'ont bien mérité.
  */
 import { useState } from "react";
-import { Fenetre } from "./calendrier";
+import { Fenetre } from "./fenetre";
 
 const INSTALLATION = "npx skills add anthropics/knowledge-work-plugins --skill crm-autopilot";
 

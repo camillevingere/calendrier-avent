@@ -19,9 +19,13 @@
     "verifier": "node scripts/verifier.ts"
   },
   "dependencies": {
+    "@react-three/fiber": "9.8.2",
+    "@react-three/postprocessing": "3.2.2",
     "next": "16.4.6",
+    "postprocessing": "6.39.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "three": "0.187.0",
     "zod": "4.6.7"
   },
   "devDependencies": {
@@ -29,6 +33,7 @@
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "0.187.0",
     "marked": "18.2.1",
     "tailwindcss": "4.3.5",
     "typescript": "^5.9"

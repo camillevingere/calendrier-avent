@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { Calendrier } from "@/components/calendrier";
 import { Decor } from "@/components/decor";
+import { Secrets } from "@/components/secrets";
 import { COOKIE_ACCES, lireTicket } from "@/lib/acces";
 import { construireGrille } from "@/lib/grille";
 
@@ -12,10 +13,10 @@ export default async function Accueil() {
   const grille = construireGrille(email !== null);
 
   return (
-    <>
+    <Secrets>
       <Decor />
       <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
-        <header className="flex flex-col items-center gap-4 text-center">
+        <header className="flex flex-col items-center gap-4 text-center [.immersif_&]:min-h-[88svh] [.immersif_&]:justify-center [.immersif_&]:pb-24">
           <a
             href="https://fyliz.com"
             className="font-pixel text-[0.6rem] tracking-[0.3em] text-gris-clair hover:text-orange sm:text-xs"
@@ -29,7 +30,7 @@ export default async function Accueil() {
           <p className="font-pixel text-[0.6rem] leading-relaxed text-creme sm:text-xs">
             LE CALENDRIER DE L&apos;AVENT IA · EDITION {new Date().getFullYear()}
           </p>
-          <p className="max-w-2xl text-xl text-gris-clair sm:text-2xl">
+          <p className="max-w-2xl text-xl text-gris-clair sm:text-2xl [.immersif_&]:text-creme">
             24 skills IA testés et expliqués pour faire gagner du temps à ta PME. Un niveau se débloque
             chaque jour de décembre, à minuit pile.
           </p>
@@ -37,7 +38,12 @@ export default async function Accueil() {
 
         <Calendrier grille={grille} email={email} />
 
-        <footer className="flex flex-col items-center gap-2 pb-28 text-center text-lg text-gris-clair">
+        {/* Dans le monde 3D, le pied de page attend la fin du voyage : sans email, la page s'arrête à la porte. */}
+        <footer
+          className={`flex flex-col items-center gap-2 pb-28 text-center text-lg text-gris-clair [.immersif_&]:min-h-svh [.immersif_&]:justify-end [.immersif_&]:text-creme ${
+            email ? "" : "[.immersif_&]:hidden"
+          }`}
+        >
           <p>
             Les cases fermées ne sont pas dans cette page : elles sont chiffrées, et c&apos;est un robot qui
             publie la clé du jour. Inutile de fouiller le code source 😉
@@ -49,9 +55,9 @@ export default async function Accueil() {
             </a>
             , ton équipe IA externalisée.
           </p>
-          <p className="text-base">Psst… 6 secrets se cachent sur cette page. Les curieux qui fouillent le code ont un indice 😉</p>
+          <p className="text-base">Psst… 6 secrets se cachent dans ce monde. Les curieux qui fouillent le code ont un indice 😉</p>
         </footer>
       </main>
-    </>
+    </Secrets>
   );
 }
